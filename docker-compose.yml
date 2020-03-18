@@ -7,6 +7,19 @@ services:
       args:
         BASE_DIR: /app/
     volumes:
+      - ./SQL/0000-00-00-schema.sql:/docker-entrypoint-initdb.d/0000-00-00-schema.sql
+      - ./SQL/0000-00-01-Permission.sql:/docker-entrypoint-initdb.d/0000-00-01-Permission.sql
+      - ./SQL/0000-00-02-Modules.sql:/docker-entrypoint-initdb.d/0000-00-02-Modules.sql
+      - ./SQL/0000-00-03-ConfigTables.sql:/docker-entrypoint-initdb.d/0000-00-03-ConfigTables.sql
+      - ./SQL/0000-00-04-Help.sql:/docker-entrypoint-initdb.d/0000-00-04-Help.sql
+      - ./SQL/0000-00-05-ElectrophysiologyTables.sql:/docker-entrypoint-initdb.d/0000-00-05-ElectrophysiologyTables.sql
+      - ./raisinbread/instruments/instrument_sql/aosi.sql:/docker-entrypoint-initdb.d/0000-00-06-aosi.sql
+      - ./raisinbread/instruments/instrument_sql/bmi.sql:/docker-entrypoint-initdb.d/0000-00-07-bmi.sql
+      - ./raisinbread/instruments/instrument_sql/medical_history.sql:/docker-entrypoint-initdb.d/0000-00-07-medical_history.sql
+      - ./raisinbread/instruments/instrument_sql/mri_parameter_form.sql:/docker-entrypoint-initdb.d/0000-00-08-mri_parameter_form.sql
+      - ./raisinbread/instruments/instrument_sql/radiology_review.sql:/docker-entrypoint-initdb.d/0000-00-09-radiology_review.sql
+      - ./test/test_instrument/testtest.sql :/docker-entrypoint-initdb.d/0000-00-10-testtest.sql
+      - ./raisinbread/RB_files/*.sql:/docker-entrypoint-initdb.d/0000-00-11-*.sql
       - ./test/mysql-config:/etc/mysql/conf.d
     environment:
       - MYSQL_DATABASE=LorisTest
