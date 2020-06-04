@@ -50,7 +50,7 @@ class ProjectsTest extends TestCase
     {
         $this->_base_uri = $this->url . '/api/v0.0.3/';
         $this->_client   = new \GuzzleHttp\Client(['base_uri' => $this->_base_uri]);
-        $response        = $this->_client->request('POST', LORIS_URL . '/login', ['json' => ['username' => UnitTester, 'password' => $this->validPassword]]);
+        $response        = $this->_client->request('POST', $this->_base_uri . '/login', ['json' => ['username' => UnitTester, 'password' => $this->validPassword]]);
         $token           = json_decode($response->getBody()->getContents())->token ?? null;
         $headers         = ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json',];
         $this->_headers  = $headers;
@@ -269,13 +269,13 @@ class ProjectsTest extends TestCase
      */
     private function _allTestsGet(array $path_arr, $p)
     {
-        $response    = $this->_client->request('GET', LORIS_URL . $p, ['headers' => $this->_headers]);
+        $response    = $this->_client->request('GET', $this->_base_uri . $p, ['headers' => $this->_headers]);
         $json_string = $response->getBody()->getContents();
         $json_arr    = json_decode((string) utf8_encode($json_string), true);
         foreach ($path_arr['GET'] as $path) {
             $path_arr = explode('/', $path);
             array_shift($path_arr);
-            $this->_allNamesGet($json_arr, $path_arr, $path=LORIS_URL);
+            $this->_allNamesGet($json_arr, $path_arr, $path=$this->_base_uri);
         }
     }
 
@@ -290,13 +290,13 @@ class ProjectsTest extends TestCase
      */
     private function _allTestsPost(array $path_arr, $p, $json)
     {
-        $response    = $this->_client->request('POST', LORIS_URL . $p, ['headers' => $this->_headers,'json' => $json]);
+        $response    = $this->_client->request('POST', $this->_base_uri . $p, ['headers' => $this->_headers,'json' => $json]);
         $json_string = $response->getBody()->getContents();
         $json_arr    = json_decode((string) utf8_encode($json_string), true);
         foreach ($path_arr['POST'] as $path) {
             $path_arr = explode('/', $path);
             array_shift($path_arr);
-            $this->_allNamesPost($json_arr, $path_arr, $path=LORIS_URL, $json);
+            $this->_allNamesPost($json_arr, $path_arr, $path=$this->_base_uri, $json);
         }
     }
 
