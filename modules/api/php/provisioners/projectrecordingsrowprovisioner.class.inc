@@ -58,7 +58,7 @@ class ProjectRecordingsRowProvisioner extends DBRowProvisioner
              LEFT JOIN psc p
                ON (s.CenterID = p.CenterID)
              LEFT JOIN Project project
-               ON (s.ProjectID = project.ProjectID)
+               ON (s.RegistrationProjectID = project.ProjectID)
              LEFT JOIN physiological_modality pm
                ON (pm.PhysiologicalModalityID = f.PhysiologicalModalityID)
              WHERE
