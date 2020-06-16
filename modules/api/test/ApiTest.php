@@ -1,27 +1,4 @@
-<?php;
-/**
- * This script sends HTTP request to every enpoints of the api module and look at the 
- * response content, status code and headers where it applies.
- *
- * PHP Version 7
- *
- * @category   API
- * @package    Tests
- * @subpackage Integration
- * @author     Simon Pelletier <simon.pelletier@mcin.ca>
- * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
- * @link       https://www.github.com/aces/Loris/
- */
-
-
-namespace LORIS\api\Test;
-require_once __DIR__ . 
-"/../../../test/integrationtests/LorisIntegrationTest.class.inc";
-require './vendor/autoload.php';
-
-use Laminas\Diactoros\Request;
-use GuzzleHttp\Client;
-
+<?php
 /**
  * PHPUnit class for API testsuite
  *
@@ -32,114 +9,1933 @@ use GuzzleHttp\Client;
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
+require_once __DIR__ . "/LorisIntegrationTest.class.inc";
+use GuzzleHttp\Client;
 
 
-class ProjectsTest extends TestCase
+class ProjectsTest extends LorisIntegrationTest
 {
 
-    private $_client;
-    private $_headers;
-    private $_base_uri;
+    private $client;
+    private $headers;
+    private $base_uri;
 
     /**
      * Used to log in
      *
      * @return void
      */
-    private function _login()
+    private function guzzleLogin()
     {
-        $this->_base_uri = $this->url . '/api/v0.0.3/';
-        $this->_client   = new \GuzzleHttp\Client(['base_uri' => $this->_base_uri]);
-        $response        = $this->_client->request('POST', $this->_base_uri . '/login', ['json' => ['username' => UnitTester, 'password' => $this->validPassword]]);
+        $this->base_uri = $this->url . '/api/v0.0.3/';
+        $this->client   = new Client(['base_uri' => $this->base_uri]);
+        $response        = $this->client->request(
+            'POST',
+            $this->base_uri . '/login',
+            ['json' => ['username' => UnitTester, 'password' => $this->validPassword]]
+        );
         $token           = json_decode($response->getBody()->getContents())->token ?? null;
         $headers         = ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json',];
-        $this->_headers  = $headers;
+        $this->headers  = $headers;
     }
 
     /**
-     * Function to get all the names that exists for subdirectories
-     * in the path inside brackets (e.g. {tarname}) and make the test
-     * for each endpoints (TODO: rename the function)
-     *
-     * @param array  $json_arr Array in JSON format
-     * @param array  $path_arr Array containing all the subdirectories of the current path after base path
-     * @param string $path     String containing the base path
+     * Tests all POST endpoints for Projects
      *
      * @return void
      */
-    private function _allNamesGet($json_arr, array $path_arr, string $path)
+    public function testGetProjectsProjectCandidatesEndpoint(): void
     {
-        $a   = '';
-        $sub = array_shift($path_arr);
-        if ($sub[0] === '{' and $sub[-1] === '}') {
-            $a = array_keys($json_arr)[0];
-            if ($sub == "{tarname}") {
-                $a = array_keys($json_arr)[1];
-            }
-            if ($sub == "{filename}") {
-                $a = array_keys($json_arr)[1];
-            }
-            if ($a == "Meta") {
-                $a = array_keys($json_arr)[1];
-            }
-            if ($a === 'Projects') {
-                $sub = array_keys($json_arr[$a]);
-            } elseif ($a === 'Candidates' or $a === "Visits"or $a === "Instruments" or $a === "Files" or $a === "DicomTars") {
-                $tmp  = $sub;
-                $sub  = array();
-                $keys = array_keys($json_arr[$a]);
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/projects', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
 
-                foreach ($keys as $key) {
-                    $substr = substr($tmp, 1, -1);
-                    if ($substr === 'candid') {
-                        $substr = 'CandID';
-                        array_push($sub, $json_arr[$a][$key][$substr]);
-                    } elseif ($substr === 'visit') {
-                        $a     = 'Visits';
-                        $upper = ucfirst($json_arr[$a][$key]);
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'instruments') {
-                        $a     = 'Instruments';
-                        $upper = ucfirst($json_arr[$a][$key]);
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'filename') {
-                        $a     = 'Files';
-                        $upper = $json_arr[$a][$key]["Filename"];
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'tarname') {
-                        $b     = 'Tarname';
-                        $upper = ucfirst($json_arr[$a][$key][$b]);
-                        array_push($sub, $upper);
+        $keys = array_keys($json_arr['Projects']);
+        foreach ($keys as $key) {
+            $response    = $this->client->request(
+                'GET',
+                $this->base_uri . '/projects/' . $key . '/candidates',
+                ['headers' => $this->headers]
+            );
+            $this->assertEquals(200, $response->getStatusCode());
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]); # The method assertIsString is not found
+            }
+
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetProjectsProjectImagesEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/projects', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $keys = array_keys($json_arr['Projects']);
+        foreach ($keys as $key) {
+            $response    = $this->client->request(
+                'GET',
+                $this->base_uri . '/projects/' . $key . '/images',
+                ['headers' => $this->headers]
+            );
+            $this->assertEquals(200, $response->getStatusCode());
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]); # The method assertIsString is not found
+            }
+
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetProjectsProjectVisitsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/projects', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $keys = array_keys($json_arr['Projects']);
+        foreach ($keys as $key) {
+            $response    = $this->client->request(
+                'GET',
+                $this->base_uri . '/projects/' . $key . '/visits',
+                ['headers' => $this->headers]
+            );
+            $this->assertEquals(200, $response->getStatusCode());
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]); # The method assertIsString is not found
+            }
+
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetProjectsProjectInstrumentsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/projects', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $keys = array_keys($json_arr['Projects']);
+        foreach ($keys as $key) {
+            $response    = $this->client->request(
+                'GET',
+                $this->base_uri . '/projects/' . $key . '/instruments',
+                ['headers' => $this->headers]
+            );
+            $this->assertEquals(200, $response->getStatusCode());
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]); # The method assertIsString is not found
+            }
+
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetProjectsProjectInstrumentsInstrument(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/projects', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+        $base_uri    = $this->base_uri;
+        $keys = array_keys($json_arr['Projects']);
+        foreach ($keys as $projectID) {
+            $base_uri = $this->base_uri . '/projects/' . $projectID . '/instruments';
+            $response = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr    = json_decode((string) utf8_encode($json_string), true);
+            $instruments = array_keys($json_arr['Instruments']);
+            foreach ($instruments as $instrument) {
+                $response = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $instrument,
+                    ['headers' => $this->headers]
+                );
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Verify the endpoint has a header
+        $headers = $response->getHeaders();
+        $this->assertNotEmpty($headers);
+        foreach ($headers as $header) {
+            $this->assertNotEmpty($header);
+            //$this->assertIsString($header[0]); # The method assertIsString is not found
+        }
+
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+
+        $this->assertNotEmpty($body);
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $keys = array_keys($json_arr['Candidates']);
+        foreach ($keys as $key) {
+            $a = $json_arr['Candidates'][$key]['CandID'];
+            $response    = $this->client->request(
+                'GET',
+                $this->base_uri . '/candidates/' . $a,
+                ['headers' => $this->headers]
+            );
+            $this->assertEquals(200, $response->getStatusCode());
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]); # The method assertIsString is not found
+            }
+
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $json_arr2['Visits'][$visit],
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitQcImagingEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $json_arr2['Visits'][$visit] . '/qc/imaging',
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitInstrumentsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $json_arr2['Visits'][$visit] . '/instruments',
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitInstrumentsInstrumentEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/instruments/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $instruments      = array_keys($json_arr3['Instruments']);
+                foreach ($instruments as $instrument) {
+                    try {
+                        $a = $json_arr3['Instruments'][$instrument];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
                     }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
                 }
             }
-        } else {
-            $sub = array($sub);
         }
-        if (gettype($sub) == 'string') {
-            $sub = array($sub);
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitInstrumentsInstrumentFlagsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/instruments/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $instruments      = array_keys($json_arr3['Instruments']);
+                foreach ($instruments as $instrument) {
+                    try {
+                        $a = $json_arr3['Instruments'][$instrument];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a . '/flags',
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
         }
-        foreach ($sub as $s) {
-            if ($a !== "Visits" and $a !== "Files" and $a !== "DicomTars") {
-                $s = strtolower($s);
-            }
+    }
 
-            if (preg_match("/v[0-9]+/", $s)) {
-                $s = ucfirst($s);
-            }
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitInstrumentsInstrumentDdeEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
 
-            if ($s !== "qc" and $s != "format") {
-                try{
-                    $response    = $this->_client->request('GET', $path . '/' . $s, ['headers' => $this->_headers]);
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/instruments/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $instruments      = array_keys($json_arr3['Instruments']);
+                foreach ($instruments as $instrument) {
+                    try {
+                        $a = $json_arr3['Instruments'][$instrument];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a . '/dde',
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitInstrumentsInstrumentDdeFlagsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/instruments/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $instruments      = array_keys($json_arr3['Instruments']);
+                foreach ($instruments as $instrument) {
+                    try {
+                        $a = $json_arr3['Instruments'][$instrument];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a . '/dde/flags',
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images',
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameQcEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameFormatBrainbrowserEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameFormatRawEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameFormatThumbnailEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameHeadersEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameHeadersFullEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitImagesFilenameHeadersHeadernameEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/images/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['Files']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['Files'][$file]['Filename'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                        if ($a === 'mri_parameter_form') {
+                            echo 'nothing';
+                        }
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitDicomsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri . '/' . $json_arr2['Visits'][$visit] . '/dicoms',
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitDicomsTarnameEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/dicoms/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['DicomTars']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['DicomTars'][$file]['Tarname'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a,
+                            ['headers' => $this->headers]
+                        );
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2    = json_decode((string) utf8_encode($json_string), true);
+            $visits        = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+
+                $this->assertEquals(200, $response->getStatusCode());
+                $headers = $response->getHeaders();
+                $this->assertNotEmpty($headers);
+                foreach ($headers as $header) {
+                    $this->assertNotEmpty($header);
+                    //$this->assertIsString($header[0]); # The method assertIsString is not found
+                }
+
+                // Verify the endpoint has a body
+                $body = $response->getBody();
+
+                $this->assertNotEmpty($body);
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'],
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileChannelsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/channels',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileChannelsMetaEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/channels/meta',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileElectrodesEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/electrodes',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileElectrodesMetaEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/electrodes/meta',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileEventsEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/events',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitRecordingsEdfFileEventsMetaEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/recordings';
+                $response  = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $recordFiles = array_keys($json_arr3['Files']);
+                foreach ($recordFiles as $recordFile) {
+                    $response  = $this->client->request(
+                        'GET',
+                        $base_uri2 . '/' . $json_arr3['Files'][$recordFile]['Filename'] . '/events/meta',
+                        ['headers' => $this->headers]
+                    );
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    // ENDPOINTS IN THIS SECTION DOES NOT EXIST YET
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitDicomsTarnameProcessesEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2 = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/dicoms/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files      = array_keys($json_arr3['DicomTars']);
+                foreach ($files as $file) {
+                    try {
+                        $a = $json_arr3['DicomTars'][$file]['Tarname'];
+                        $response = $this->client->request(
+                            'GET',
+                            $base_uri2 . '/' . $a . '/processes',
+                            ['headers' => $this->headers]
+                        );
+                    } catch (\Exception $e) {
+                        echo $e->getMessage(), "\n\n";
+                    }
+
+                    $this->assertEquals(200, $response->getStatusCode());
+                    $headers = $response->getHeaders();
+                    $this->assertNotEmpty($headers);
+                    foreach ($headers as $header) {
+                        $this->assertNotEmpty($header);
+                        //$this->assertIsString($header[0]); # The method assertIsString is not found
+                    }
+
+                    // Verify the endpoint has a body
+                    $body = $response->getBody();
+
+                    $this->assertNotEmpty($body);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests all POST endpoints for Projects
+     *
+     * @return void
+     */
+    public function testGetCandidatesCandidVisitDicomsTarnameProcessesProcessidEndpoint(): void
+    {
+        $this->guzzleLogin();
+        $response    = $this->client->request('GET', $this->base_uri . '/candidates', ['headers' => $this->headers]);
+        $json_string = $response->getBody()->getContents();
+        $json_arr    = json_decode((string) utf8_encode($json_string), true);
+
+        $candids = array_keys($json_arr['Candidates']);
+        foreach ($candids as $candid) {
+            $id = $json_arr['Candidates'][$candid]['CandID'];
+            $base_uri    = $this->base_uri . '/candidates/' . $id;
+            $response    = $this->client->request(
+                'GET',
+                $base_uri,
+                ['headers' => $this->headers]
+            );
+            $json_string = $response->getBody()->getContents();
+            $json_arr2   = json_decode((string) utf8_encode($json_string), true);
+            $visits      = array_keys($json_arr2['Visits']);
+            foreach ($visits as $visit) {
+                $base_uri2   = $base_uri . '/' . $json_arr2['Visits'][$visit] . '/dicoms/';
+                $response    = $this->client->request(
+                    'GET',
+                    $base_uri2,
+                    ['headers' => $this->headers]
+                );
+                $json_string = $response->getBody()->getContents();
+                $json_arr3   = json_decode((string) utf8_encode($json_string), true);
+                $files       = array_keys($json_arr3['DicomTars']);
+                foreach ($files as $file) {
+                    $a = $json_arr3['DicomTars'][$file]['Tarname'];
+                    $base_uri3   = $base_uri2 . '/' . $a . '/processes';
+                    $response    = $this->client->request(
+                        'GET',
+                        $base_uri3,
+                        ['headers' => $this->headers]
+                    );
                     $json_string = $response->getBody()->getContents();
-                    $json_arr    = json_decode((string) utf8_encode($json_string), true);
-                    if (count($path_arr) > 0 ) {
-                        $this->_allNamesGet($json_arr, $path_arr, $path . '/' . $s);
-                    } else {
-                        // Verify the status code
+                    $json_arr4   = json_decode((string) utf8_encode($json_string), true);
+                    $processIDs  = array_keys($json_arr4['DicomTars']);
+                    foreach ($files as $file) {
                         $this->assertEquals(200, $response->getStatusCode());
-
-                        // Verify the endpoint has a header
                         $headers = $response->getHeaders();
                         $this->assertNotEmpty($headers);
                         foreach ($headers as $header) {
@@ -152,151 +1948,8 @@ class ProjectsTest extends TestCase
 
                         $this->assertNotEmpty($body);
                     }
-
-                } catch (\Exception $e){
-                    echo $e->getMessage(), "\n\n";
                 }
             }
-        }
-    }
-
-    /**
-     * Tests all POST endpoints for Candidates
-     *
-     * @param $json_arr Array in JSON format
-     * @param array  $path_arr Array containing all the subdirectories of the current path after base path
-     * @param string $path     String containing the base path
-     * @param string $json     json
-     *
-     * @return void
-     */
-    private function _allNamesPost($json_arr, array $path_arr, string $path, $json)
-    {
-        $a   = '';
-        $sub = array_shift($path_arr);
-        if ($sub[0] === '{' and $sub[-1] === '}') {
-            $a = array_keys($json_arr)[0];
-            if ($sub == "{tarname}") {
-                $a = array_keys($json_arr)[1];
-            }
-            if ($a == "Meta") {
-                $a = array_keys($json_arr)[1];
-            }
-            if ($a === 'Projects') {
-                $sub = array_keys($json_arr[$a]);
-            } elseif ($a === 'Candidates' or $a === "Visits"or $a === "Instruments" or $a === "Files" or $a === "DicomTars") {
-                $tmp  = $sub;
-                $sub  = array();
-                $keys = array_keys($json_arr[$a]);
-
-                foreach ($keys as $key) {
-                    $substr = substr($tmp, 1, -1);
-                    if ($substr === 'candid') {
-                        $substr = 'CandID';
-                        array_push($sub, $json_arr[$a][$key][$substr]);
-                    } elseif ($substr === 'visit') {
-                        $a     = 'Visits';
-                        $upper = ucfirst($json_arr[$a][$key]);
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'instruments') {
-                        $a     = 'Instruments';
-                        $upper = ucfirst($json_arr[$a][$key]);
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'filename') {
-                        $a     = 'Files';
-                        $upper = ucfirst($json_arr[$a][$key]["Filename"]);
-                        array_push($sub, $upper);
-                    } elseif ($substr === 'tarname') {
-                        $b     = 'Tarname';
-                        $upper = ucfirst($json_arr[$a][$key][$b]);
-                        array_push($sub, $upper);
-                    }
-                }
-            }
-        } else {
-            $sub = array($sub);
-        }
-        if (gettype($sub) == 'string') {
-            $sub = array($sub);
-        }
-        foreach ($sub as $s) {
-            if ($a !== "Visits" and $a !== "Files" and $a !== "DicomTars") {
-                $s = strtolower($s);
-            }
-            if (preg_match("/v[0-9]+/", $s)) {
-                $s = ucfirst($s);
-            }
-
-            if ($s !== "qc" and $s != "format") {
-                try{
-                    $response    = $this->_client->request('POST', $path . '/' . $s, ['headers' => $this->_headers, 'json' => $json]);
-                    $json_string = $response->getBody()->getContents();
-                    $json_arr    = json_decode((string) utf8_encode($json_string), true);
-                    if (count($path_arr) > 0 ) {
-                        $this->_allNamesPost($json_arr, $path_arr, $path . '/' . $s, $json);
-                    } else {
-                        // Verify the status code
-                        $this->assertEquals(201, $response->getStatusCode());
-
-                        // Verify the endpoint has a header
-                        $headers = $response->getHeaders();
-                        $this->assertNotEmpty($headers);
-                        foreach ($headers as $header) {
-                            $this->assertNotEmpty($header);
-                            //$this->assertIsString($header[0]);
-                        }
-
-                        // Verify the endpoint has a body
-                        $body = $response->getBody();
-
-                        $this->assertNotEmpty($body);
-                    }
-
-                } catch (\Exception $e){
-                    echo $e->getMessage(), "\n\n";
-                }
-            }
-        }
-    }
-
-    /**
-     * Tests all POST endpoints for Candidates
-     *
-     * @param array  $path_arr Array containing all subdirectories of the path
-     * @param string $p        string
-     *
-     * @return void
-     */
-    private function _allTestsGet(array $path_arr, $p)
-    {
-        $response    = $this->_client->request('GET', $this->_base_uri . $p, ['headers' => $this->_headers]);
-        $json_string = $response->getBody()->getContents();
-        $json_arr    = json_decode((string) utf8_encode($json_string), true);
-        foreach ($path_arr['GET'] as $path) {
-            $path_arr = explode('/', $path);
-            array_shift($path_arr);
-            $this->_allNamesGet($json_arr, $path_arr, $path=$this->_base_uri);
-        }
-    }
-
-    /**
-     * Tests all POST endpoints for Candidates
-     *
-     * @param array $path_arr Array containing all subdirectories of the path
-     * @param $p        string
-     * @param $json     string
-     *
-     * @return void
-     */
-    private function _allTestsPost(array $path_arr, $p, $json)
-    {
-        $response    = $this->_client->request('POST', $this->_base_uri . $p, ['headers' => $this->_headers,'json' => $json]);
-        $json_string = $response->getBody()->getContents();
-        $json_arr    = json_decode((string) utf8_encode($json_string), true);
-        foreach ($path_arr['POST'] as $path) {
-            $path_arr = explode('/', $path);
-            array_shift($path_arr);
-            $this->_allNamesPost($json_arr, $path_arr, $path=$this->_base_uri, $json);
         }
     }
 
@@ -305,93 +1958,10 @@ class ProjectsTest extends TestCase
      *
      * @return void
      */
-    public function testProjectsEndpoints(): void
+    public function testPostProjectsProjectCandidatesEndpoint(): void
     {
-        $endpoints = array(
-            "GET" =>
-                array(
-                    '/projects',
-                    '/projects/{project}',
-                    '/projects/{project}/candidates',
-                    '/projects/{project}/images',
-                    '/projects/{project}/instruments',
-                    '/projects/{project}/instruments/{instrument}',
-                    '/projects/{project}/visits',
-                )
-        );
-        $this->_login();
-
-        $this->_allTestsGet($endpoints, 'projects');
-    }
-
-    /**
-     * Tests all GET endpoints for Candidates
-     *
-     * @return void
-     */
-    public function testCandidatesGetEndpoints(): void
-    {
-        $this->base_url = 'https://test-loris-dev.loris.ca/api/v0.0.3/';
-        $endpoints      = array(
-            "GET" =>
-                array(
-                    // Candidates
-                    '/candidates',
-                    '/candidates/{candid}',
-
-                    // Visit
-                    '/candidates/{candid}/{visit}',
-                    '/candidates/{candid}/{visit}/qc/imaging',
-
-                    // Instruments
-                    '/candidates/{candid}/{visit}/instruments',
-                    '/candidates/{candid}/{visit}/instruments/{instrument}',
-                    '/candidates/{candid}/{visit}/instruments/{instrument}/flags',
-                    '/candidates/{candid}/{visit}/instruments/{instrument}/dde',
-                    '/candidates/{candid}/{visit}/instruments/{instrument}/dde/flags',
-                    // images
-                    '/candidates/{candid}/{visit}/images',
-                    '/candidates/{candid}/{visit}/images/{filename}',
-                    //'/candidates/{candid}/{visit}/images/{filename}/qc',
-
-                    '/candidates/{candid}/{visit}/images/{filename}/format/brainbrowser',
-                    '/candidates/{candid}/{visit}/images/{filename}/format/raw',
-                    '/candidates/{candid}/{visit}/images/{filename}/format/thumbnail',
-                    '/candidates/{candid}/{visit}/images/{filename}/headers',
-                    '/candidates/{candid}/{visit}/images/{filename}/headers/full',
-                    '/candidates/{candid}/{visit}/images/{filename}/headers/{headername}',
-                    // Dicoms
-                    '/candidates/{candid}/{visit}/dicoms',
-                    '/candidates/{candid}/{visit}/dicoms/{tarname}',
-                    '/candidates/{candid}/{visit}/dicoms/{tarname}/processes',
-                    '/candidates/{candid}/{visit}/dicoms/{tarname}/processes/{processid}',
-                )
-        );
-        $this->_login();
-
-        $this->_allTestsGet($endpoints, 'candidates');
-    }
-
-    /**
-     * Tests all POST endpoints for Candidates
-     *
-     * @return void
-     */
-    public function testCandidatesPostEndpoints(): void
-    {
-        $this->base_url = 'https://test-loris-dev.loris.ca/api/v0.0.3/';
-        $endpoints      = array(
-            "POST" =>
-                array(
-                    '/candidates',
-                    // Dicoms
-                    //'/candidates/{candid}/{visit}/dicoms',
-                    //'/candidates/{candid}/{visit}/dicoms/{tarname}/processes'
-                )
-        );
-        $this->_login();
-
-        $json1      = [
+        $this->guzzleLogin();
+        $json1       = [
             'Candidate' =>
                 [
                     'CandID'  => "111111",
@@ -403,7 +1973,7 @@ class ProjectsTest extends TestCase
                     'Sex'     => "Male"
                 ]
         ];
-        $json_exist = [
+        $json_exist  = [
             'Candidate' =>
                 [
                     'CandID'  => "115787",
@@ -415,10 +1985,34 @@ class ProjectsTest extends TestCase
                     'Sex'     => "Female"
                 ]
         ];
+        $jsons       = [$json1, $json_exist];
+        foreach ($jsons as $json) {
+            $response    = $this->client->request(
+                'POST',
+                $this->base_uri . '/candidates',
+                ['headers' => $this->headers,'json' => $json]
+            );
+            // Verify the status code
+            $this->assertEquals(201, $response->getStatusCode());
 
-        $this->_allTestsPost($endpoints, 'candidates', $json1);
-        $this->_allTestsPost($endpoints, 'candidates', $json_exist);
+            // Verify the endpoint has a header
+            $headers = $response->getHeaders();
+            $this->assertNotEmpty($headers);
+            foreach ($headers as $header) {
+                $this->assertNotEmpty($header);
+                //$this->assertIsString($header[0]);
+            }
 
+            // Verify the endpoint has a body
+            $body = $response->getBody();
+
+            $this->assertNotEmpty($body);
+        }
     }
 }
 
+
+// TODO Add endpoint /api/v0.0.3/projects/{project}/dicoms
+
+// EDF (recordings) file at https://spelletier-dev.loris.ca/api/v0.0.3/candidates/300167/V1/recordings/sub-OTT167_ses-V1_task-faceO_eeg.edf
+// image at https://spelletier-dev.loris.ca/api/v0.0.3/candidates/400162/V6/images/[demo_400162_V6_t1_001.mnc, demo_400162_V6_t2_001.mnc, demo_400162_V6_dwi25_001.mnc]
