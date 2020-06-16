@@ -9,7 +9,7 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
-require_once __DIR__ . "../../../test/LorisIntegrationTest.class.inc";
+require_once __DIR__ . "/../../../test/LorisIntegrationTest.class.inc";
 use GuzzleHttp\Client;
 
 
