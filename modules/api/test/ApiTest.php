@@ -32,7 +32,7 @@ class ProjectsTest extends LorisIntegrationTest
         $response        = $this->client->request(
             'POST',
             $this->base_uri . '/login',
-            ['json' => ['username' => UnitTester, 'password' => $this->validPassword]]
+            ['json' => ['username' => 'UnitTester', 'password' => $this->validPassword]]
         );
         $token           = json_decode($response->getBody()->getContents())->token ?? null;
         $headers         = ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json',];
