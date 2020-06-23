@@ -40,6 +40,16 @@ class VisitDicomsRowProvisioner extends DBRowProvisioner
         parent::__construct(
             '
              SELECT
+               s.CandID as Candidate,
+               c.PSCID as PSCID,
+               c.Entity_type as Entity_type, 
+               s.Visit_label as Visit,
+               s.Date_visit as Visit_date,
+               s.CenterID as CenterID,
+               p.Name as Site,
+               qc.QCStatus as QC_status,
+               qc.Selected as Selected,
+               t.DicomArchiveID as DicomArchiveID,
                t.TarchiveID as tarchiveid
              FROM tarchive t
              JOIN session s

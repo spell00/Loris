@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /**
- * This file implements a data provisioner to get all images of a project
+ * This file implements a data provisioner to get all dicoms of a project
  * created since a given date.
  *
  * PHP Version 7
@@ -15,9 +15,9 @@
 namespace LORIS\api\Provisioners;
 
 use \LORIS\Data\Provisioners\DBRowProvisioner;
-use \LORIS\api\Models\ProjectImagesRow;
+use \LORIS\api\Models\ProjectDicomsRow;
 /**
- * This file implements a data provisioner to get all images of a project
+ * This file implements a data provisioner to get all dicoms of a project
  * created since a given date.
  *
  * PHP Version 7
@@ -28,13 +28,13 @@ use \LORIS\api\Models\ProjectImagesRow;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-class ProjectImagesRowProvisioner extends DBRowProvisioner
+class ProjectDicomsRowProvisioner extends DBRowProvisioner
 {
     /**
      * Create a RowProvisioner
      *
-     * @param \Project  $project The project from which images are requested
-     * @param \DateTime $since   The project from which images are requested
+     * @param \Project  $project The project from which dicoms are requested
+     * @param \DateTime $since   The project from which dicoms are requested
      */
     function __construct(\Project $project, \DateTime $since)
     {
@@ -48,13 +48,10 @@ class ProjectImagesRowProvisioner extends DBRowProvisioner
                s.Date_visit as Visit_date,
                s.CenterID as CenterID,
                p.Name as Site,
-               f.InsertTime as InsertTime,
-               f.File as File,
                mst.Scan_type as ScanType,
                qc.QCStatus as QC_status,
                qc.Selected as Selected
-             FROM
-               files f
+             FROM tarchive t
              LEFT JOIN mri_scan_type mst
                ON (mst.ID = f.AcquisitionProtocolID)
              LEFT JOIN session s
@@ -71,7 +68,6 @@ class ProjectImagesRowProvisioner extends DBRowProvisioner
                c.Active = \'Y\' AND
                s.Active = \'Y\' AND
                project.Name = :v_projectname AND
-               f.InsertTime > :v_time
              ORDER BY f.InsertTime ASC
             ',
             [
@@ -82,7 +78,7 @@ class ProjectImagesRowProvisioner extends DBRowProvisioner
     }
 
     /**
-     * Returns an instance of a ProjectImagesRow object for a given
+     * Returns an instance of a ProjectDicomsRow object for a given
      * table row.
      *
      * @param array $row The database row from the LORIS Database class.
@@ -91,7 +87,7 @@ class ProjectImagesRowProvisioner extends DBRowProvisioner
      */
     public function getInstance($row) : \LORIS\Data\DataInstance
     {
-        return new ProjectImagesRow($row);
+        return new ProjectDicomsRow($row);
     }
 }
 

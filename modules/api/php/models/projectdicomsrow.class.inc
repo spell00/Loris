@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /**
  * PHP Version 7
  *
@@ -12,7 +12,7 @@
 namespace LORIS\api\Models;
 
 /**
- * A ProjectImagesRow contains values from an image of a project.
+ * A ProjectDicomsRow contains values from an image of a project.
  *
  * @category API
  * @package  Loris
@@ -20,7 +20,7 @@ namespace LORIS\api\Models;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-class ProjectImagesRow implements \LORIS\Data\DataInstance
+class ProjectDicomsRow implements \LORIS\Data\DataInstance
 {
     private $_candid;
     private $_pscid;
@@ -29,14 +29,21 @@ class ProjectImagesRow implements \LORIS\Data\DataInstance
     private $_visitdate;
     private $_centerid;
     private $_centername;
-    private $_filename;
     private $_inserttime;
     private $_scantype;
     private $_qcstatus;
     private $_selected;
+    /**
+     * @var mixed|null
+     */
+    private $_tarname;
+    /**
+     * @var mixed|null
+     */
+    private $_dicomarchiveid;
 
     /**
-     * Create a new ProjectImagesRow
+     * Create a new ProjectDicomsRow
      *
      * @param array $row An array of image propeties
      */
@@ -49,7 +56,8 @@ class ProjectImagesRow implements \LORIS\Data\DataInstance
         $this->_visitdate  = $row['Visit_date'] ?? null;
         $this->_centerid   = $row['CenterID'] ?? null;
         $this->_centername = $row['Site'] ?? null;
-        $this->_filename   = $row['File'] ?? null;
+        $this->_tarname    = $row['tarchiveid'] ?? null;
+        $this->_dicomarchiveid    = $row['DicomArchiveID'] ?? null;
         $this->_inserttime = $row['InsertTime'] ?? null;
         $this->_scantype   = $row['ScanType'] ?? null;
         $this->_qcstatus   = $row['QC_status'] ?? null;
@@ -74,11 +82,11 @@ class ProjectImagesRow implements \LORIS\Data\DataInstance
             'QC_status'  => $this->_qcstatus,
             'Selected'   => $this->_selected,
         ];
-        $filename = basename($this->_filename);
+        $filename = basename($this->_tarname);
         $candid   = $obj['Candidate'];
         $visit    = $obj['Visit'];
 
-        $obj['Link']       = "/candidates/$candid/$visit/images/$filename";
+        $obj['Link']       = "/candidates/$candid/$visit/dicoms/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
         return json_encode($obj);
