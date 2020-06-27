@@ -38,20 +38,27 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
      */
     function __construct(\Project $project, \DateTime $since)
     {
-        parent::__construct(
+	            parent::__construct(
             '
              SELECT
                s.CandID as Candidate,
                c.PSCID as PSCID,
-               c.Entity_type as Entity_type, 
+               c.Entity_type as Entity_type,
                s.Visit_label as Visit,
                s.Date_visit as Visit_date,
                s.CenterID as CenterID,
                p.Name as Site,
+               f.InsertTime as InsertTime,
+               f.File as File,
                mst.Scan_type as ScanType,
                qc.QCStatus as QC_status,
-               qc.Selected as Selected
-             FROM tarchive t
+               qc.Selected as Selected,
+               t.TarchiveID as tarchiveid,
+               t.DicomArchiveID as DicomArchiveID,
+               t.ArchiveLocation as Archive,
+               t.SourceLocation as Source
+             FROM
+               files f
              LEFT JOIN mri_scan_type mst
                ON (mst.ID = f.AcquisitionProtocolID)
              LEFT JOIN session s
@@ -64,10 +71,13 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
                ON (f.FileID = qc.FileID)
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
+	     LEFT JOIN tarchive t
+               ON (s.ID = t.SessionID)
              WHERE
                c.Active = \'Y\' AND
                s.Active = \'Y\' AND
                project.Name = :v_projectname AND
+               f.InsertTime > :v_time
              ORDER BY f.InsertTime ASC
             ',
             [

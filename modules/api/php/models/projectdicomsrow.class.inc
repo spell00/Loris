@@ -58,6 +58,8 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
         $this->_centername = $row['Site'] ?? null;
         $this->_tarname    = $row['tarchiveid'] ?? null;
         $this->_dicomarchiveid    = $row['DicomArchiveID'] ?? null;
+        $this->_source    = $row['Source'] ?? null;
+        $this->_archive    = $row['Archive'] ?? null;
         $this->_inserttime = $row['InsertTime'] ?? null;
         $this->_scantype   = $row['ScanType'] ?? null;
         $this->_qcstatus   = $row['QC_status'] ?? null;
@@ -81,12 +83,17 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
             'ScanType'   => $this->_scantype,
             'QC_status'  => $this->_qcstatus,
             'Selected'   => $this->_selected,
+	    'TarchiveID' => $this->_tarname,
+	    'Source'         => $this->_source,
+	    'Archive'         => $this->_archive,
+	    'DicomArchiveID' => $this->_dicomarchiveid
         ];
-        $filename = basename($this->_tarname);
+        $filename = explode('/', $this->_archive)[1];
         $candid   = $obj['Candidate'];
         $visit    = $obj['Visit'];
-
-        $obj['Link']       = "/candidates/$candid/$visit/dicoms/$filename";
+        
+	$obj['tarname']    = $filename;
+        $obj['Path']       = "/candidates/$candid/$visit/dicoms/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
         return json_encode($obj);
