@@ -38,7 +38,7 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
      */
     function __construct(\Project $project, \DateTime $since)
     {
-	            parent::__construct(
+        parent::__construct(
             '
              SELECT
                s.CandID as Candidate,

@@ -33,14 +33,10 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     private $_scantype;
     private $_qcstatus;
     private $_selected;
-    /**
-     * @var mixed|null
-     */
     private $_tarname;
-    /**
-     * @var mixed|null
-     */
     private $_dicomarchiveid;
+    private $_source;
+    private $_archive;
 
     /**
      * Create a new ProjectDicomsRow
@@ -49,21 +45,21 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
      */
     public function __construct(array $row)
     {
-        $this->_candid     = $row['Candidate'] ?? null;
-        $this->_pscid      = $row['PSCID'] ?? null;
-        $this->_entitytype = $row['Entity_type'] ?? null;
-        $this->_visitlabel = $row['Visit'] ?? null;
-        $this->_visitdate  = $row['Visit_date'] ?? null;
-        $this->_centerid   = $row['CenterID'] ?? null;
-        $this->_centername = $row['Site'] ?? null;
-        $this->_tarname    = $row['tarchiveid'] ?? null;
-        $this->_dicomarchiveid    = $row['DicomArchiveID'] ?? null;
-        $this->_source    = $row['Source'] ?? null;
-        $this->_archive    = $row['Archive'] ?? null;
-        $this->_inserttime = $row['InsertTime'] ?? null;
-        $this->_scantype   = $row['ScanType'] ?? null;
-        $this->_qcstatus   = $row['QC_status'] ?? null;
-        $this->_selected   = $row['Selected'] ?? null;
+        $this->_candid         = $row['Candidate'] ?? null;
+        $this->_pscid          = $row['PSCID'] ?? null;
+        $this->_entitytype     = $row['Entity_type'] ?? null;
+        $this->_visitlabel     = $row['Visit'] ?? null;
+        $this->_visitdate      = $row['Visit_date'] ?? null;
+        $this->_centerid       = $row['CenterID'] ?? null;
+        $this->_centername     = $row['Site'] ?? null;
+        $this->_tarname        = $row['tarchiveid'] ?? null;
+        $this->_dicomarchiveid = $row['DicomArchiveID'] ?? null;
+        $this->_source         = $row['Source'] ?? null;
+        $this->_archive        = $row['Archive'] ?? null;
+        $this->_inserttime     = $row['InsertTime'] ?? null;
+        $this->_scantype       = $row['ScanType'] ?? null;
+        $this->_qcstatus       = $row['QC_status'] ?? null;
+        $this->_selected       = $row['Selected'] ?? null;
     }
 
     /**
@@ -73,27 +69,26 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
      */
     public function toJSON() : string
     {
-        $obj      = [
-            'Candidate'  => $this->_candid,
-            'PSCID'      => $this->_pscid,
-            'Visit'      => $this->_visitlabel,
-            'Visit_date' => $this->_visitdate,
-            'Site'       => $this->_centername,
-            'InsertTime' => $this->_inserttime,
-            'ScanType'   => $this->_scantype,
-            'QC_status'  => $this->_qcstatus,
-            'Selected'   => $this->_selected,
-	    'TarchiveID' => $this->_tarname,
-	    'Source'         => $this->_source,
-	    'Archive'         => $this->_archive,
-	    'DicomArchiveID' => $this->_dicomarchiveid
+        $obj            = [
+            'Candidate'      => $this->_candid,
+            'PSCID'          => $this->_pscid,
+            'Visit'          => $this->_visitlabel,
+            'Visit_date'     => $this->_visitdate,
+            'Site'           => $this->_centername,
+            'InsertTime'     => $this->_inserttime,
+            'ScanType'       => $this->_scantype,
+            'QC_status'      => $this->_qcstatus,
+            'Selected'       => $this->_selected,
+            'TarchiveID'     => $this->_tarname,
+            'Source'         => $this->_source,
+            'Archive'        => $this->_archive,
+            'DicomArchiveID' => $this->_dicomarchiveid
         ];
-        $filename = explode('/', $this->_archive)[1];
-        $candid   = $obj['Candidate'];
-        $visit    = $obj['Visit'];
-        
-	$obj['tarname']    = $filename;
-        $obj['Path']       = "/candidates/$candid/$visit/dicoms/$filename";
+        $filename       = explode('/', $this->_archive)[1];
+        $candid         = $obj['Candidate'];
+        $visit          = $obj['Visit'];
+        $obj['tarname'] = $filename;
+        $obj['Path']    = "/candidates/$candid/$visit/dicoms/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
         return json_encode($obj);
