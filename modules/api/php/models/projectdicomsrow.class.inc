@@ -4,7 +4,7 @@
  *
  * @category API
  * @package  Loris
- * @author   Xavier Lecours Boucher <xavier.lecours@mcin.ca>
+ * @author   Simon Pelletier <simon.pelletier@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
@@ -16,7 +16,7 @@ namespace LORIS\api\Models;
  *
  * @category API
  * @package  Loris
- * @author   Xavier Lecours Boucher <xavier.lecours@mcin.ca>
+ * @author   Simon Pelletier <simon.pelletier@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
