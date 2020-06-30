@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /**
  * This implements the Project page class under Projects
  *
