@@ -31,8 +31,6 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     private $_centername;
     private $_inserttime;
     private $_scantype;
-    private $_qcstatus;
-    private $_selected;
     private $_tarname;
     private $_dicomarchiveid;
     private $_source;
