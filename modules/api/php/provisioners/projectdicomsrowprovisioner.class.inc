@@ -49,26 +49,18 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
                s.CenterID as CenterID,
                p.Name as Site,
                f.InsertTime as InsertTime,
-               f.File as File,
-               mst.Scan_type as ScanType,
-               qc.QCStatus as QC_status,
-               qc.Selected as Selected,
                t.TarchiveID as tarchiveid,
                t.DicomArchiveID as DicomArchiveID,
                t.ArchiveLocation as Archive,
                t.SourceLocation as Source
              FROM
                files f
-             LEFT JOIN mri_scan_type mst
-               ON (mst.ID = f.AcquisitionProtocolID)
              LEFT JOIN session s
                ON (f.SessionID = s.ID)
              LEFT JOIN candidate c
                ON (s.CandID = c.CandID)
              LEFT JOIN psc p
                ON (s.CenterID = p.CenterID)
-             LEFT JOIN files_qcstatus qc
-               ON (f.FileID = qc.FileID)
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
 	     LEFT JOIN tarchive t

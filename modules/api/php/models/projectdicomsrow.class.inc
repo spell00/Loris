@@ -58,8 +58,6 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
         $this->_archive        = $row['Archive'] ?? null;
         $this->_inserttime     = $row['InsertTime'] ?? null;
         $this->_scantype       = $row['ScanType'] ?? null;
-        $this->_qcstatus       = $row['QC_status'] ?? null;
-        $this->_selected       = $row['Selected'] ?? null;
     }
 
     /**
@@ -76,9 +74,6 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
             'Visit_date'     => $this->_visitdate,
             'Site'           => $this->_centername,
             'InsertTime'     => $this->_inserttime,
-            'ScanType'       => $this->_scantype,
-            'QC_status'      => $this->_qcstatus,
-            'Selected'       => $this->_selected,
             'TarchiveID'     => $this->_tarname,
             'Source'         => $this->_source,
             'Archive'        => $this->_archive,
@@ -87,7 +82,7 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
         $filename       = explode('/', $this->_archive)[1];
         $candid         = $obj['Candidate'];
         $visit          = $obj['Visit'];
-        $obj['tarname'] = $filename;
+        $obj['Tarname'] = $filename;
         $obj['Path']    = "/candidates/$candid/$visit/dicoms/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
