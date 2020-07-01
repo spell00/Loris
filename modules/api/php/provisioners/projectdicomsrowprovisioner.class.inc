@@ -52,7 +52,11 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
                t.TarchiveID as tarchiveid,
                t.DicomArchiveID as DicomArchiveID,
                t.ArchiveLocation as Archive,
-               t.SourceLocation as Source
+	       t.SourceLocation as Source,
+               f.TarchiveSource as TarchiveSource,
+               f.AcquisitionProtocolID as AcquisitionProtocolID,
+               f.ProcessProtocolID as ProcessProtocolID,
+               ts.TarchiveSeriesID as TarchiveSeriesID
              FROM
                files f
              LEFT JOIN session s
@@ -64,7 +68,11 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
 	     LEFT JOIN tarchive t
-               ON (s.ID = t.SessionID)
+               ON (f.TarchiveSource = t.TarchiveID)
+             LEFT JOIN tarchive_series ts
+               ON (ts.TarchiveID = t.TarchiveID)
+	     LEFT JOIN server_processes sp
+               ON (sp.pid = f.ProcessProtocolID)
              WHERE
                c.Active = \'Y\' AND
                s.Active = \'Y\' AND

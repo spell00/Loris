@@ -35,7 +35,10 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     private $_dicomarchiveid;
     private $_source;
     private $_archive;
-
+    private $_processid;
+    private $_acquisitionprotocolid;
+    private $_tarchiveseriesid;
+    private $_processprotocolid;
     /**
      * Create a new ProjectDicomsRow
      *
@@ -51,11 +54,16 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
         $this->_centerid       = $row['CenterID'] ?? null;
         $this->_centername     = $row['Site'] ?? null;
         $this->_tarname        = $row['tarchiveid'] ?? null;
+        $this->_processid      = $row['processid'] ?? null;
+        $this->_processprotocolid      = $row['ProcessProtocolID'] ?? null;
+        $this->_tarchivesource      = $row['TarchiveSource'] ?? null;
         $this->_dicomarchiveid = $row['DicomArchiveID'] ?? null;
+        $this->_acquisitionprotocolid = $row['AcquisitionProtocolID'] ?? null;
         $this->_source         = $row['Source'] ?? null;
         $this->_archive        = $row['Archive'] ?? null;
         $this->_inserttime     = $row['InsertTime'] ?? null;
         $this->_scantype       = $row['ScanType'] ?? null;
+        $this->_tarchiveseriesid = $row['TarchiveSeriesID'] ?? null;
     }
 
     /**
@@ -66,15 +74,20 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     public function toJSON() : string
     {
         $obj            = [
-            'Candidate'      => $this->_candid,
             'PSCID'          => $this->_pscid,
+            'AcquisitionProtocolID' => $this->_acquisitionprotocolid,
+            'ProcessProtocolID' => $this->_processprotocolid,
+            'Candidate'      => $this->_candid,
             'Visit'          => $this->_visitlabel,
             'Visit_date'     => $this->_visitdate,
             'Site'           => $this->_centername,
             'InsertTime'     => $this->_inserttime,
+            'TarchiveSource'     => $this->_tarchivesource,
             'TarchiveID'     => $this->_tarname,
+            'processid'      => $this->_processid,
             'Source'         => $this->_source,
             'Archive'        => $this->_archive,
+            'TarchiveSeriesID' => $this->_tarchiveseriesid,
             'DicomArchiveID' => $this->_dicomarchiveid
         ];
         $filename       = explode('/', $this->_archive)[1];
