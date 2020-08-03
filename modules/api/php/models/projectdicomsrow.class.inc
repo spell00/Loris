@@ -46,23 +46,23 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
      */
     public function __construct(array $row)
     {
-        $this->_candid         = $row['Candidate'] ?? null;
-        $this->_pscid          = $row['PSCID'] ?? null;
-        $this->_entitytype     = $row['Entity_type'] ?? null;
-        $this->_visitlabel     = $row['Visit'] ?? null;
-        $this->_visitdate      = $row['Visit_date'] ?? null;
-        $this->_centerid       = $row['CenterID'] ?? null;
-        $this->_centername     = $row['Site'] ?? null;
-        $this->_tarname        = $row['tarchiveid'] ?? null;
-        $this->_processid      = $row['processid'] ?? null;
-        $this->_processprotocolid      = $row['ProcessProtocolID'] ?? null;
-        $this->_tarchivesource      = $row['TarchiveSource'] ?? null;
-        $this->_dicomarchiveid = $row['DicomArchiveID'] ?? null;
+        $this->_candid     = $row['Candidate'] ?? null;
+        $this->_pscid      = $row['PSCID'] ?? null;
+        $this->_entitytype = $row['Entity_type'] ?? null;
+        $this->_visitlabel = $row['Visit'] ?? null;
+        $this->_visitdate  = $row['Visit_date'] ?? null;
+        $this->_centerid   = $row['CenterID'] ?? null;
+        $this->_centername = $row['Site'] ?? null;
+        $this->_tarname    = $row['tarchiveid'] ?? null;
+        $this->_processid  = $row['processid'] ?? null;
+        $this->_processprotocolid     = $row['ProcessProtocolID'] ?? null;
+        $this->_tarchivesource        = $row['TarchiveSource'] ?? null;
+        $this->_dicomarchiveid        = $row['DicomArchiveID'] ?? null;
         $this->_acquisitionprotocolid = $row['AcquisitionProtocolID'] ?? null;
-        $this->_source         = $row['Source'] ?? null;
-        $this->_archive        = $row['Archive'] ?? null;
-        $this->_inserttime     = $row['InsertTime'] ?? null;
-        $this->_scantype       = $row['ScanType'] ?? null;
+        $this->_source           = $row['Source'] ?? null;
+        $this->_archive          = $row['Archive'] ?? null;
+        $this->_inserttime       = $row['InsertTime'] ?? null;
+        $this->_scantype         = $row['ScanType'] ?? null;
         $this->_tarchiveseriesid = $row['TarchiveSeriesID'] ?? null;
     }
 
@@ -74,21 +74,21 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     public function toJSON() : string
     {
         $obj            = [
-            'PSCID'          => $this->_pscid,
+            'PSCID'                 => $this->_pscid,
             'AcquisitionProtocolID' => $this->_acquisitionprotocolid,
-            'ProcessProtocolID' => $this->_processprotocolid,
-            'Candidate'      => $this->_candid,
-            'Visit'          => $this->_visitlabel,
-            'Visit_date'     => $this->_visitdate,
-            'Site'           => $this->_centername,
-            'InsertTime'     => $this->_inserttime,
-            'TarchiveSource'     => $this->_tarchivesource,
-            'TarchiveID'     => $this->_tarname,
-            'processid'      => $this->_processid,
-            'Source'         => $this->_source,
-            'Archive'        => $this->_archive,
-            'TarchiveSeriesID' => $this->_tarchiveseriesid,
-            'DicomArchiveID' => $this->_dicomarchiveid
+            'ProcessProtocolID'     => $this->_processprotocolid,
+            'Candidate'             => $this->_candid,
+            'Visit'                 => $this->_visitlabel,
+            'Visit_date'            => $this->_visitdate,
+            'Site'                  => $this->_centername,
+            'InsertTime'            => $this->_inserttime,
+            'TarchiveSource'        => $this->_tarchivesource,
+            'TarchiveID'            => $this->_tarname,
+            'processid'             => $this->_processid,
+            'Source'                => $this->_source,
+            'Archive'               => $this->_archive,
+            'TarchiveSeriesID'      => $this->_tarchiveseriesid,
+            'DicomArchiveID'        => $this->_dicomarchiveid
         ];
         $filename       = explode('/', $this->_archive)[1];
         $candid         = $obj['Candidate'];
