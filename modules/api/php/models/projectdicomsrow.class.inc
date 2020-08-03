@@ -69,9 +69,9 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
     /**
      * Implements \LORIS\Data\DataInstance interface for this row.
      *
-     * @return string the row data.
+     * @return array the row data.
      */
-    public function toJSON() : string
+    public function jsonSerialize() : array
     {
         $obj            = [
             'PSCID'                 => $this->_pscid,
@@ -97,7 +97,7 @@ class ProjectDicomsRow implements \LORIS\Data\DataInstance
         $obj['Path']    = "/candidates/$candid/$visit/dicoms/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
-        return json_encode($obj);
+        return $obj;
     }
 
     /**
