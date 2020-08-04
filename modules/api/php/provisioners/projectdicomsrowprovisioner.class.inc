@@ -33,11 +33,15 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
     /**
      * Create a RowProvisioner
      *
-     * @param \Project  $project The project from which dicoms are requested
-     * @param \DateTime $since   The project from which dicoms are requested
+     * @param \Project  $project   The project from which dicoms are requested
+     * @param \DateTime $since     The date from which dicoms are requested
+     * @param string    $classname The class name of the returned objects
      */
-    function __construct(\Project $project, \DateTime $since)
-    {
+    function __construct(
+        \Project $project,
+        \DateTime $since,
+        string $classname='default'
+    ) {
         parent::__construct(
             '
              SELECT
@@ -54,7 +58,7 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
                t.TarchiveID as tarchiveid,
                t.DicomArchiveID as DicomArchiveID,
                t.ArchiveLocation as Archive,
-	           t.SourceLocation as Source,
+	       t.SourceLocation as Source,
              FROM
                tarchive t
              LEFT JOIN  session s
@@ -66,8 +70,8 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
              WHERE
-               c.Active = \'Y\' AND
-               s.Active = \'Y\' AND
+               c.Active = "Y" AND
+               s.Active = "Y" AND
                project.Name = :v_projectname AND
                t.DateLastArchived > :v_time
              ORDER BY t.DateLastArchived ASC
@@ -75,7 +79,8 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
             [
                 'v_projectname' => $project->getName(),
                 'v_time'        => $since->getTimestamp(),
-            ]
+            ],
+            $classname
         );
     }
 
