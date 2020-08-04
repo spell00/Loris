@@ -14,7 +14,7 @@
 
 namespace LORIS\api\Provisioners;
 
-use \LORIS\Data\Provisioners\DBRowProvisioner;
+use \LORIS\Data\Provisioners\DBObjectProvisioner;
 use \LORIS\api\Models\ProjectDicomsRow;
 /**
  * This file implements a data provisioner to get all dicoms of a project
@@ -28,7 +28,7 @@ use \LORIS\api\Models\ProjectDicomsRow;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-class ProjectDicomsRowProvisioner extends DBRowProvisioner
+class ProjectDicomsRowProvisioner extends DBObjectProvisioner
 {
     /**
      * Create a RowProvisioner
@@ -48,38 +48,30 @@ class ProjectDicomsRowProvisioner extends DBRowProvisioner
                s.Date_visit as Visit_date,
                s.CenterID as CenterID,
                p.Name as Site,
-               f.InsertTime as InsertTime,
+               t.DateAcquired as date_acquired,
+               t.DateFirstArchived as date_first_archived,
+               t.DateLastArchived as date_last_archived,
                t.TarchiveID as tarchiveid,
                t.DicomArchiveID as DicomArchiveID,
                t.ArchiveLocation as Archive,
-	       t.SourceLocation as Source,
-               f.TarchiveSource as TarchiveSource,
-               f.AcquisitionProtocolID as AcquisitionProtocolID,
-               f.ProcessProtocolID as ProcessProtocolID,
-               ts.TarchiveSeriesID as TarchiveSeriesID
+	           t.SourceLocation as Source,
              FROM
-               files f
-             LEFT JOIN session s
-               ON (f.SessionID = s.ID)
+               tarchive t
+             LEFT JOIN  session s
+               ON (t.SessionID = s.ID)
              LEFT JOIN candidate c
                ON (s.CandID = c.CandID)
              LEFT JOIN psc p
                ON (s.CenterID = p.CenterID)
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
-	     LEFT JOIN tarchive t
-               ON (f.TarchiveSource = t.TarchiveID)
-             LEFT JOIN tarchive_series ts
-               ON (ts.TarchiveID = t.TarchiveID)
-	     LEFT JOIN server_processes sp
-               ON (sp.pid = f.ProcessProtocolID)
              WHERE
                c.Active = \'Y\' AND
                s.Active = \'Y\' AND
                project.Name = :v_projectname AND
-               f.InsertTime > :v_time
-             ORDER BY f.InsertTime ASC
-            ',
+               t.DateLastArchived > :v_time
+             ORDER BY t.DateLastArchived ASC
+	    ',
             [
                 'v_projectname' => $project->getName(),
                 'v_time'        => $since->getTimestamp(),
