@@ -37,8 +37,8 @@ class Dicoms
      */
     public function __construct(\Timepoint $timepoint, DicomTarDTO ...$dicoms)
     {
-        $this->_timepoint = $timepoint;
-        $this->_dicoms    = $dicoms;
+        $this->_timepoint     = $timepoint;
+        $this->_dicoms        = $dicoms;
     }
 
     /**
@@ -51,10 +51,13 @@ class Dicoms
      */
     private static function _formatDicomTars(DicomTarDTO $dicom): array
     {
+        $_tarlocation = $dicom->getArchiveLocation();
         return [
-            'Tarname'     => $dicom->getTarname(),
-            'Patientname' => $dicom->getPatientname(),
-            'SeriesInfo'  => array_map(
+            'Tarname'      => $dicom->getTarname(),
+            'TarPath'      => $_tarlocation,
+            'Size (bytes)' => filesize("/data-raisinbread/tarchive/$_tarlocation"),
+            'Patientname'  => $dicom->getPatientname(),
+            'SeriesInfo'   => array_map(
                 [
                     'self',
                     '_formatSeries'
