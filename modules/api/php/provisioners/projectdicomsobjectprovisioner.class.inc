@@ -28,7 +28,7 @@ use \LORIS\api\Models\ProjectDicomsRow;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-class ProjectDicomsRowProvisioner extends DBObjectProvisioner
+class ProjectDicomsObjectProvisioner extends DBObjectProvisioner
 {
     /**
      * Create a RowProvisioner
@@ -40,7 +40,7 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
     function __construct(
         \Project $project,
         \DateTime $since,
-        string $classname='default'
+        string $classname='ProjectDicomsObjectProvisioner'
     ) {
         parent::__construct(
             '
@@ -82,19 +82,6 @@ class ProjectDicomsRowProvisioner extends DBObjectProvisioner
             ],
             $classname
         );
-    }
-
-    /**
-     * Returns an instance of a ProjectDicomsRow object for a given
-     * table row.
-     *
-     * @param array $row The database row from the LORIS Database class.
-     *
-     * @return \LORIS\Data\DataInstance An instance representing this row.
-     */
-    public function getInstance($row) : \LORIS\Data\DataInstance
-    {
-        return new ProjectDicomsRow($row);
     }
 }
 

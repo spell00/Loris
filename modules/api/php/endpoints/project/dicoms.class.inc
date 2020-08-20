@@ -119,9 +119,10 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
             );
         }
 
-        $provisioner = new \LORIS\api\Provisioners\ProjectDicomsRowProvisioner(
+        $provisioner = new \LORIS\api\Provisioners\ProjectDicomsObjectProvisioner(
             $this->_project,
-            $since
+            $since,
+	    '\LORIS\api\Models\ProjectDicomsRow'
         );
         $dicoms      = (new \LORIS\Data\Table())
             ->withDataFrom($provisioner)
