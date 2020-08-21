@@ -11,6 +11,8 @@
 
 namespace LORIS\api\Models;
 
+use LORIS\api\Endpoints\Candidate\Candidate;
+
 /**
  * A ProjectDicomsObject contains values from an image of a project.
  *
@@ -29,6 +31,8 @@ class ProjectDicomsObject implements \LORIS\Data\DataInstance
      */
     public function jsonSerialize() : array
     {
-        return get_object_vars($this);
+        $obj         = get_object_vars($this);
+        $obj['Path'] = explode('/', $obj['Archive'])[1];
+        return $obj;
     }
 }

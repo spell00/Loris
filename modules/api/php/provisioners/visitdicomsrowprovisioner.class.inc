@@ -41,20 +41,13 @@ class VisitDicomsRowProvisioner extends DBRowProvisioner
         parent::__construct(
             '
              SELECT
-               s.CandID as Candidate,
-               c.PSCID as PSCID,
-               c.Entity_type as Entity_type,
-               s.Visit_label as Visit,
-               s.Date_visit as Visit_date,
-               s.CenterID as CenterID,
-               t.DicomArchiveID as DicomArchiveID,
                t.TarchiveID as tarchiveid
              FROM tarchive t
              JOIN session s
                ON (s.ID=t.SessionID)
              JOIN candidate c
                ON (s.CandID=c.CandID)
-             WHERE
+             WHERE 
                c.Active=\'Y\' AND
                s.Active=\'Y\' AND
                s.ID = :v_sessionid
@@ -79,3 +72,4 @@ class VisitDicomsRowProvisioner extends DBRowProvisioner
             ->asDTO();
     }
 }
+

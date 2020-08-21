@@ -124,15 +124,13 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
             $since,
             '\LORIS\api\Models\ProjectDicomsObject'
         );
-        $dicoms = [];
+
         $all = $provisioner->getAllInstances();
+
+        $dicoms = [];
         foreach ($all as $value) {
             array_push($dicoms, $value);
         }
-
-        //$dicoms      = (new \LORIS\Data\Table())
-        //    ->withDataFrom($provisioner)
-        //    ->toArray($request->getAttribute('user'));
 
         $this->_cache = new \LORIS\Http\Response\JsonResponse(
             ['Dicoms' => $dicoms]
