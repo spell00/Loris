@@ -14,7 +14,7 @@ namespace LORIS\api\Models;
 use LORIS\api\Endpoints\Candidate\Candidate;
 
 /**
- * A ProjectDicomsObject contains values from an image of a project.
+ * A ProjectDicomsObject contains values from a Dicom file of a project.
  *
  * @category API
  * @package  Loris

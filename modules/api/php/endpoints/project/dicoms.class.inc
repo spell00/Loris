@@ -1,6 +1,6 @@
 <?php
 /**
- * This implements the Images page class under Project
+ * This implements the Dicoms page class under Project
  *
  * PHP Version 7
  *
