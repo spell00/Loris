@@ -15,7 +15,7 @@
 namespace LORIS\api\Provisioners;
 
 use \LORIS\Data\Provisioners\DBObjectProvisioner;
-use \LORIS\api\Models\ProjectDicomsRow;
+use \LORIS\api\Models\ProjectDicomsObject;
 /**
  * This file implements a data provisioner to get all dicoms of a project
  * created since a given date.
@@ -31,7 +31,7 @@ use \LORIS\api\Models\ProjectDicomsRow;
 class ProjectDicomsObjectProvisioner extends DBObjectProvisioner
 {
     /**
-     * Create a RowProvisioner
+     * Create a ObjectProvisioner
      *
      * @param \Project  $project   The project from which dicoms are requested
      * @param \DateTime $since     The date from which dicoms are requested
@@ -58,7 +58,7 @@ class ProjectDicomsObjectProvisioner extends DBObjectProvisioner
                t.TarchiveID as tarchiveid,
                t.DicomArchiveID as DicomArchiveID,
                t.ArchiveLocation as Archive,
-	       t.SourceLocation as Source,
+	           t.SourceLocation as Source
              FROM
                tarchive t
              LEFT JOIN  session s
@@ -70,12 +70,11 @@ class ProjectDicomsObjectProvisioner extends DBObjectProvisioner
              LEFT JOIN Project project
                ON (c.RegistrationProjectID = project.ProjectID)
              WHERE
-               c.Active = "Y" AND
-               s.Active = "Y" AND
+               c.Active = \'Y\' AND
+               s.Active = \'Y\' AND
                project.Name = :v_projectname AND
                t.DateLastArchived > :v_time
-             ORDER BY t.DateLastArchived ASC
-	    ',
+             ORDER BY t.DateLastArchived ASC;	    ',
             [
                 'v_projectname' => $project->getName(),
                 'v_time'        => $since->getTimestamp(),
