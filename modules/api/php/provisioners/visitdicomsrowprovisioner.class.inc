@@ -28,7 +28,6 @@ use \LORIS\Data\Provisioners\DBRowProvisioner;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-
 class VisitDicomsRowProvisioner extends DBRowProvisioner
 {
     /**
