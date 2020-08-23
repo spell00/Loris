@@ -15,7 +15,6 @@
 namespace LORIS\api\Provisioners;
 
 use \LORIS\Data\Provisioners\DBObjectProvisioner;
-use \LORIS\api\Models\ProjectDicomsObject;
 /**
  * This file implements a data provisioner to get all dicoms of a project
  * created since a given date.
