@@ -39,6 +39,24 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
     private $_project;
 
     /**
+     * Permission checks
+     *
+     * @param \User $user The requesting user
+     *
+     * @return boolean true if access is permitted
+     */
+    private function _hasAccess(\User $user)
+    {
+        return (
+            $user->hasPermission('dicom_archive_view_allsites') ||
+            (
+                $user->hasStudySite()
+                && $user->hasPermission('dicom_archive_view_allsites')
+            )
+        );
+    }
+
+    /**
      * Contructor
      *
      * @param \Project $project The requested project
@@ -78,6 +96,15 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
+        $user = $request->getAttribute('user');
+        if ($user instanceof \LORIS\AnonymousUser) {
+            return new \LORIS\Http\Response\JSON\Unauthorized();
+        }
+
+        if (!$this->_hasAccess($user)) {
+            return new \LORIS\Http\Response\JSON\Forbidden();
+        }
+
         $pathparts = $request->getAttribute('pathparts');
         if (count($pathparts) !== 0) {
             return new \LORIS\Http\Response\JSON\NotFound();
@@ -125,12 +152,7 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
             '\LORIS\api\Models\ProjectDicomsObject'
         );
 
-        $all = $provisioner->getAllInstances();
-
-        $dicoms = [];
-        foreach ($all as $value) {
-            array_push($dicoms, $value);
-        }
+        $dicoms = iterator_to_array($provisioner->getAllInstances());
 
         $this->_cache = new \LORIS\Http\Response\JsonResponse(
             ['Dicoms' => $dicoms]
