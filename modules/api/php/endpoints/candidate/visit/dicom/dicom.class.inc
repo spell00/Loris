@@ -80,12 +80,17 @@ class Dicom extends Endpoint implements \LORIS\Middleware\ETagCalculator
     protected function supportedVersions() : array
     {
         return [
+<<<<<<< 9f06b94dca045561f20d4555a91c6f806e408b8c
 <<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
             'v0.0.3',
             'v0.0.4-dev',
 =======
             'v0.0.3'
 >>>>>>> initial commit of transition to api v0.0.4
+=======
+            'v0.0.3',
+            'v0.0.4',
+>>>>>>> [API] adds v0.0.4 in the supported versions of the /candidate dicom endpoint
         ];
     }
 
