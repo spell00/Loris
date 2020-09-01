@@ -82,9 +82,15 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
 =======
         // Removed 0.0.2 since session requires a project.
          return [
+<<<<<<< 17f3d25ca4bcbadcd8ffc6d1b5e4e6b42eca8df2
             'v0.0.2',
             'v0.0.3',
             'v0.0.4',
+>>>>>>> initial commit of transition to api v0.0.4
+=======
+             'v0.0.2',
+             'v0.0.3',
+             'v0.0.4',
 >>>>>>> initial commit of transition to api v0.0.4
          ];
     }
