@@ -285,7 +285,7 @@ class User extends UserPermissions implements \LORIS\StudyEntities\AccessibleRes
     }
 
      /**
-      * Get the user's site's ID number
+      * Get the user's center's ID number
       *
       * @return array
       */
@@ -299,7 +299,7 @@ class User extends UserPermissions implements \LORIS\StudyEntities\AccessibleRes
     }
 
     /**
-     * Get the user's sites' ID numbers
+     * Get the user's centers' ID numbers
      *
      * @return array
      */
@@ -309,7 +309,7 @@ class User extends UserPermissions implements \LORIS\StudyEntities\AccessibleRes
     }
 
     /**
-     * Get the user's sites' ID numbers
+     * Get the user's projects' ID numbers
      *
      * @return array
      */
