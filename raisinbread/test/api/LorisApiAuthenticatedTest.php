@@ -38,7 +38,11 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
     {
         parent::setUp();
 
+<<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
         $this->_version = 'v0.0.4-dev';
+=======
+        $this->_version = 'v0.0.4';
+>>>>>>> initial commit of transition to api v0.0.4
 
         // store the original JWT key for restoring it later
         $jwtConfig = $this->DB->pselect(

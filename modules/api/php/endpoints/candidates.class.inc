@@ -74,19 +74,12 @@ class Candidates extends Endpoint implements \LORIS\Middleware\ETagCalculator
     {
         return [
             "v0.0.3",
+<<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
             "v0.0.4-dev",
+=======
+            "v0.0.4",
+>>>>>>> initial commit of transition to api v0.0.4
         ];
-    }
-
-    /**
-     * Tells the base class that this page's provisioner can support
-     * the UserProjectMatch filter.
-     *
-     * @return bool always true
-     */
-    public function useProjectFilter() : bool
-    {
-        return true;
     }
 
     /**
@@ -166,11 +159,9 @@ class Candidates extends Endpoint implements \LORIS\Middleware\ETagCalculator
             ->filter($filter)
             ->filter(new \LORIS\Data\Filters\UserProjectMatch());
 
-        if ($this->useProjectFilter()) {
-            $provisioner = $provisioner->filter(
-                new \LORIS\Data\Filters\UserProjectMatch()
-            );
-        }
+        $provisioner = $provisioner->filter(
+            new \LORIS\Data\Filters\UserProjectMatch()
+        );
 
         $candidates = (new \LORIS\Data\Table())
             ->withDataFrom($provisioner)

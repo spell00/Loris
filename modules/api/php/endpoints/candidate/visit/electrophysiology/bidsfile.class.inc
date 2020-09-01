@@ -59,7 +59,11 @@ class BidsFile extends Endpoint
     {
         return [
             'v0.0.3',
+<<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
             'v0.0.4-dev',
+=======
+            'v0.0.4',
+>>>>>>> initial commit of transition to api v0.0.4
         ];
     }
 

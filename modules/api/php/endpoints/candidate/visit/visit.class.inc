@@ -75,9 +75,17 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     protected function supportedVersions() : array
     {
+<<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
          return [
              'v0.0.3',
              'v0.0.4-dev',
+=======
+        // Removed 0.0.2 since session requires a project.
+         return [
+            'v0.0.2',
+            'v0.0.3',
+            'v0.0.4',
+>>>>>>> initial commit of transition to api v0.0.4
          ];
     }
 
