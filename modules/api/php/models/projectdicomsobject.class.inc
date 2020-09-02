@@ -29,7 +29,7 @@ class ProjectDicomsObject implements \LORIS\Data\DataInstance
      */
     public function jsonSerialize() : array
     {
-        $obj         = get_object_vars($this);
+        $obj = get_object_vars($this);
         $obj['FileName'] = basename($obj['Archive']);
         return $obj;
     }
