@@ -80,7 +80,7 @@ class ProjectImagesRow implements \LORIS\Data\DataInstance
 
         $obj['Link']       = "/candidates/$candid/$visit/images/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
-
+        $obj['File']       = $filename;
         return $obj;
     }
 
