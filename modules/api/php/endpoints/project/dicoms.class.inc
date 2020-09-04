@@ -47,9 +47,7 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     private function _hasAccess(\User $user)
     {
-        return (
-            $user->hasPermission('dicom_archive_view_allsites')
-        );
+        return $user->hasPermission('dicom_archive_view_allsites');
     }
 
     /**
