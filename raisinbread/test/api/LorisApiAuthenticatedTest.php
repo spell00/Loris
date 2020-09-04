@@ -27,7 +27,7 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
     protected $base_uri;
     protected $originalJwtKey;
     protected $configIdJwt;
- 
+
     /**
      * Overrides LorisIntegrationTest::setUp() to store the current JWT key
      * and replaces it for an acceptable one.
@@ -38,11 +38,15 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
     {
         parent::setUp();
 
+<<<<<<< a7cd8c8a06d3b93bb2ea7a9e6b38bdeb5658c2f5
 <<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
         $this->_version = 'v0.0.4-dev';
 =======
         $this->_version = 'v0.0.4';
 >>>>>>> initial commit of transition to api v0.0.4
+=======
+        $this->version = 'v0.0.4';
+>>>>>>> Adds the integration tests for \Project Dicoms endpoint
 
         // store the original JWT key for restoring it later
         $jwtConfig = $this->DB->pselect(
@@ -91,7 +95,7 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
      */
     public function apiLogin($username, $password)
     {
-        $this->base_uri = "$this->url/api/$this->_version/";
+        $this->base_uri = "$this->url/api/$this->version/";
         $this->client   = new Client(['base_uri' => $this->base_uri]);
         $response       = $this->client->request(
             'POST',
