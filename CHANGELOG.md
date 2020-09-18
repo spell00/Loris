@@ -34,6 +34,8 @@ requesting a new account and will be displayed in the User Accounts module (PR #
 - Deletion of support for the oldest version of the API (v0.0.2) (PR #6844)
 #### Candidate Parameters
 - Consents may now be grouped in UI of consent tab (PR #6042, PR #6044)
+#### API
+- API is now at version 0.0.4 (v0.0.4) (PR #6944) 
 ### Clean Up
 - *Add item here*
 ### Notes For Existing Projects
