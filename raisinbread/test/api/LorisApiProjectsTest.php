@@ -651,7 +651,7 @@ class LorisApiProjectsTest extends LorisApiAuthenticatedTest
             $projectsDicomsArray['Dicoms']['0']
         );
         $this->assertArrayHasKey(
-            'datte_last_archived',
+            'date_last_archived',
             $projectsDicomsArray['Dicoms']['0']
         );
         $this->assertArrayHasKey(
