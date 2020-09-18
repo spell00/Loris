@@ -538,71 +538,71 @@ class LorisApiProjectsTest extends LorisApiAuthenticatedTest
             true
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']),
+            gettype($projectsDicomsArray['Dicoms']),
             'array'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']),
+            gettype($projectsDicomsArray['Dicoms']['0']),
             'array'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Candidate']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Candidate']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['PSCID']),
+            gettype($projectsDicomsArray['Dicoms']['0']['PSCID']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Entity_type']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Entity_type']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Visit']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Visit']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Visit_date']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Visit_date']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['CenterID']),
+            gettype($projectsDicomsArray['Dicoms']['0']['CenterID']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Site']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Site']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['date_acquired']),
+            gettype($projectsDicomsArray['Dicoms']['0']['date_acquired']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['date_first_archived']),
+            gettype($projectsDicomsArray['Dicoms']['0']['date_first_archived']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['date_last_archived']),
+            gettype($projectsDicomsArray['Dicoms']['0']['date_last_archived']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['tarchiveid']),
+            gettype($projectsDicomsArray['Dicoms']['0']['tarchiveid']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['DicomArchiveID']),
+            gettype($projectsDicomsArray['Dicoms']['0']['DicomArchiveID']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Archive']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Archive']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['Source']),
+            gettype($projectsDicomsArray['Dicoms']['0']['Source']),
             'string'
         );
         $this->assertSame(
-            gettype($projectsDicomsArray['Images']['0']['FileName']),
+            gettype($projectsDicomsArray['Dicoms']['0']['FileName']),
             'string'
         );
 
