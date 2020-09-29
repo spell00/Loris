@@ -96,7 +96,10 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
 
         case 'PUT':
             return $this->_handlePUT($request);
+<<<<<<< df29ed8075cfd1826c6760b2abf1460b441653dd
 
+=======
+>>>>>>> Fixes the integration tests of the Projects Instruments endpoints
         case 'PATCH':
             return $this->_handlePATCH($request);
 
@@ -138,6 +141,7 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     private function _handlePUT(ServerRequestInterface $request) : ResponseInterface
     {
+<<<<<<< df29ed8075cfd1826c6760b2abf1460b441653dd
         $user = $request->getAttribute('user');
         if (!$user->_hasPermission('data_entry')) {
             return new \LORIS\Http\Response\JSON\Forbidden(
@@ -145,6 +149,9 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
             );
         }
 
+=======
+        // TODO :: Check permissions. How??
+>>>>>>> Fixes the integration tests of the Projects Instruments endpoints
         $this->_instrumentStatus = new \NDB_BVL_InstrumentStatus();
         $this->_instrumentStatus->select($this->_instrument->commentID);
 
@@ -193,6 +200,7 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     private function _handlePATCH(ServerRequestInterface $request): ResponseInterface
     {
+<<<<<<< df29ed8075cfd1826c6760b2abf1460b441653dd
         $user = $request->getAttribute('user');
         if (!$this->_instrument->_hasAccess($user)) {
             return new \LORIS\Http\Response\JSON\Forbidden(
@@ -200,6 +208,9 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
             );
         }
 
+=======
+        // TODO :: Check permissions. How??
+>>>>>>> Fixes the integration tests of the Projects Instruments endpoints
         $this->_instrumentStatus = new \NDB_BVL_InstrumentStatus();
         $this->_instrumentStatus->select($this->_instrument->commentID);
 
