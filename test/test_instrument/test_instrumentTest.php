@@ -337,5 +337,8 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
 
 =======
 ?>
+<<<<<<< c080a6ea623b283b2e9f969dd979d1586072783c
 >
 >>>>>>> Fixes the integration tests of the Projects Instruments endpoints
+=======
+>>>>>>> Remove details added by mistake
