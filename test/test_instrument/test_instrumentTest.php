@@ -337,8 +337,12 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
 
 =======
 ?>
+<<<<<<< 027cefd0cb3fd210e33a97ed1129d8aa939714e3
 <<<<<<< c080a6ea623b283b2e9f969dd979d1586072783c
 >
 >>>>>>> Fixes the integration tests of the Projects Instruments endpoints
 =======
 >>>>>>> Remove details added by mistake
+=======
+>
+>>>>>>> Restore testtest instrument for integration tests
