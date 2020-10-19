@@ -6,7 +6,7 @@ use Facebook\WebDriver\WebDriverSelect;
 /**
  * Instrument_builder automated integration tests
  *
- * PHP Version 7
+ * PHP Version 5
  *
  * @category Test
  * @package  Loris
@@ -14,8 +14,14 @@ use Facebook\WebDriver\WebDriverSelect;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
+Class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
 {
+    /**
+     * Tests that, when loading the Instrument builder module, some
+     * text appears in the body.
+     *
+     * @return void
+     */
     /**
      * Inserting testing data.
      *
@@ -24,7 +30,6 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
     public function setUp()
     {
         parent::setUp();
-<<<<<<< 4a8ef9c6b98c7e0a7d69cc6e984425fef0406339
         $this->DB->insert(
             "candidate",
             [
@@ -67,44 +72,15 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
                 'CommentID' => '11111111111111111',
             ]
         );
-=======
-        $this->DB->insert("candidate", array(
-            'CandID'                => '900000',
-            'PSCID'                 => 'TST0001',
-            'RegistrationCenterID'  => 1,
-            'RegistrationProjectID' => 1,
-            'Active'                => 'Y',
-            'UserID'                => 1,
-            'Entity_type'           => 'Human',
-            'Sex'                   => 'Female'
-        ));
-        $this->DB->insert('session', array(
-            'ID'             => '999999',
-            'CandID'         => '900000',
-            'Visit_label'    => 'V1',
-            'CenterID'       => 1,
-            'ProjectID'      => 1,
-            'Current_stage'  => 'Not Started',
-        ));
-	$this->DB->insert('test_names', array(
-	    'ID' => '999999',
-            'Test_name' => 'testtest',
-            'Full_name' => 'Test Test',
-            'Sub_group' => 1,
-        ));
-        $this->DB->insert('flag', array(
-            'ID' => '999999',
-            'SessionID' => '999999',
-            'Test_name' => 'testtest',
-            'CommentID' => '11111111111111111',
-        ));
-        $this->DB->insert('flag', array(
-            'ID' => '999999',
-            'SessionID' => '999999',
-            'Test_name' => 'testtest',
-            'CommentID' => 'DDE_11111111111111111',
-        ));
->>>>>>> Fixes the integration tests of the Projects Instruments endpoints
+        $this->DB->insert(
+            'flag',
+            [
+                'ID'        => '999999',
+                'SessionID' => '999999',
+                'Test_name' => 'testtest',
+                'CommentID' => 'DDE_11111111111111111',
+            ]
+        );
         // Set up database wrapper and config
     }
 
@@ -173,7 +149,6 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
         // $this->_testContent("instrument element");
     }
 
-<<<<<<< 4a8ef9c6b98c7e0a7d69cc6e984425fef0406339
     /**
      * Testing instrument element appears in the body.
      * After editing NDB_instrument php file, modify $instrument_element
@@ -213,47 +188,6 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
         $data =  $this->DB->pselectOne(
             'SELECT Data FROM flag where SessionID = 999999',
             []
-=======
-   /**
-    * Testing instrument element appears in the body.
-    * After editing NDB_instrument php file, modify $instrument_element
-    * 
-    * @return void
-    */
-//    function testInstrumentWithLorisForm()
-//    {
-
-//         $this->_testContent("$instrument_element");
-
-//    }
-   function testTextElement()
-   {
-      $this->_landing();
-      $textElement = $this->webDriver->findElement(
-             WebDriverBy::Name("testText")
-      )->sendKeys("Test Text successful"); 
-      $this->webDriver->findElement(
-             WebDriverBy::Name("fire_away")
-      )->click();
-      $data =  $this->DB->pselectOne(
-        'SELECT Data FROM flag where SessionID = 999999 AND CommentID = 11111111111111111',array()
-        );
-      $this->assertContains('Test Text successful',$data); 
-    } 
-
-
-   function testCheckBoxElement()
-   {
-      $this->_landing();
-      $textElement = $this->webDriver->findElement(
-             WebDriverBy::Name("testCheckbox")
-      )->click();
-      $this->webDriver->findElement(
-             WebDriverBy::Name("fire_away")
-      )->click();
-      $data =  $this->DB->pselectOne(
-        'SELECT Data FROM flag where SessionID = 999999 AND CommentID = 11111111111111111',array()
->>>>>>> Fixes the integration tests of the Projects Instruments endpoints
         );
         $this->assertContains('"testCheckbox":"1"', $data);
     }
@@ -291,29 +225,9 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
             WebDriverBy::Name("fire_away")
         )->click();
 
-<<<<<<< 4a8ef9c6b98c7e0a7d69cc6e984425fef0406339
         $data =  $this->DB->pselectOne(
             'SELECT Data FROM flag where SessionID = 999999',
             []
-=======
-      $data =  $this->DB->pselectOne(
-        'SELECT Data FROM flag where SessionID = 999999 AND CommentID = 11111111111111111',array()
-        );
-      $this->assertContains('"consent":"yes"',$data);
-
-      // select 'No' option and check it.
-      $this->_landing();
-      $select  = $this->safeFindElement(WebDriverBy::Name("consent"));
-      $element = new WebDriverSelect($select);
-      $element->selectByVisibleText("No");
-      
-      $this->webDriver->findElement(
-             WebDriverBy::Name("fire_away")
-      )->click();
-
-      $data =  $this->DB->pselectOne(
-        'SELECT Data FROM flag where SessionID = 999999 AND CommentID = 11111111111111111',array()
->>>>>>> Fixes the integration tests of the Projects Instruments endpoints
         );
         $this->assertContains('"consent":"no"', $data);
 
@@ -333,16 +247,3 @@ class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
         );
     }
 }
-<<<<<<< 4a8ef9c6b98c7e0a7d69cc6e984425fef0406339
-
-=======
-?>
-<<<<<<< 027cefd0cb3fd210e33a97ed1129d8aa939714e3
-<<<<<<< c080a6ea623b283b2e9f969dd979d1586072783c
->
->>>>>>> Fixes the integration tests of the Projects Instruments endpoints
-=======
->>>>>>> Remove details added by mistake
-=======
->
->>>>>>> Restore testtest instrument for integration tests
