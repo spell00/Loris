@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ .
-    "/../../../test/test_instrument/test_instrumentTest.php";
+    "/../../../test/integrationtests/LorisIntegrationTest.class.inc";
 use GuzzleHttp\Client;
 
 /**
@@ -18,7 +18,7 @@ use GuzzleHttp\Client;
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
-class LorisApiAuthenticatedTest extends TestInstrumentTestIntegrationTest
+class LorisApiAuthenticatedTest extends LorisIntegrationTest
 {
 
     protected $client;
