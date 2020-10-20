@@ -75,10 +75,14 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     protected function supportedVersions() : array
     {
+<<<<<<< db115a73d4bda4f6053b7aecc1f9159e70ade703
          return [
              'v0.0.3',
              'v0.0.4-dev',
          ];
+=======
+        return ['v0.0.3'];
+>>>>>>> Removed the line saying "Removed 0.0.2 since session requires a project". 0.0.2 is no longer supported.
     }
 
     /**
