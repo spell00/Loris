@@ -6,7 +6,7 @@ use Facebook\WebDriver\WebDriverSelect;
 /**
  * Instrument_builder automated integration tests
  *
- * PHP Version 5
+ * PHP Version 7
  *
  * @category Test
  * @package  Loris
@@ -14,14 +14,8 @@ use Facebook\WebDriver\WebDriverSelect;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-Class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
+class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
 {
-    /**
-     * Tests that, when loading the Instrument builder module, some
-     * text appears in the body.
-     *
-     * @return void
-     */
     /**
      * Inserting testing data.
      *
@@ -70,15 +64,6 @@ Class TestInstrumentTestIntegrationTest extends LorisIntegrationTest
                 'SessionID' => '999999',
                 'Test_name' => 'testtest',
                 'CommentID' => '11111111111111111',
-            ]
-        );
-        $this->DB->insert(
-            'flag',
-            [
-                'ID'        => '999998',
-                'SessionID' => '999999',
-                'Test_name' => 'testtest',
-                'CommentID' => 'DDE_11111111111111111',
             ]
         );
         // Set up database wrapper and config
