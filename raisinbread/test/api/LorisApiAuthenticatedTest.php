@@ -95,7 +95,7 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
      */
     public function apiLogin($username, $password)
     {
-        $this->base_uri = "$this->url/api/$this->version/";
+        $this->base_uri = "$this->url/api/$this->_version/";
         $this->client   = new Client(['base_uri' => $this->base_uri]);
         $response       = $this->client->request(
             'POST',
