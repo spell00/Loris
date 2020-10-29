@@ -161,4 +161,3 @@ class Metadata extends Endpoint implements \LORIS\Middleware\ETagCalculator
         return md5(json_encode($this->_handleGET($request)->getBody()));
     }
 }
-
