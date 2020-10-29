@@ -223,3 +223,4 @@ class Recording extends Endpoint implements \LORIS\Middleware\ETagCalculator
         return md5(json_encode($signature));
     }
 }
+
