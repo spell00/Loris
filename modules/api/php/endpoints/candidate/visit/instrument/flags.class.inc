@@ -96,10 +96,14 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
 
         case 'PUT':
             return $this->_handlePUT($request);
+<<<<<<< d0ba631d45acad66462b580c52fe315e113f420c
 <<<<<<< df29ed8075cfd1826c6760b2abf1460b441653dd
 
 =======
 >>>>>>> Fixes the integration tests of the Projects Instruments endpoints
+=======
+
+>>>>>>> 2020-09-29-FixApiIntrumentsIntegrationTests
         case 'PATCH':
             return $this->_handlePATCH($request);
 
