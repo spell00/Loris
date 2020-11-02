@@ -78,7 +78,7 @@ class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     protected function supportedVersions() : array
     {
-        return ["v0.0.4"];
+        return ["v0.0.4-dev"];
     }
 
     /**
