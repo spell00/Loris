@@ -39,7 +39,7 @@ class ProjectDicomsObjectProvisioner extends DBObjectProvisioner
     function __construct(
         \Project $project,
         \DateTime $since,
-        string $classname='ProjectDicomsObjectProvisioner'
+        string $classname='ProjectDicomsObject'
     ) {
         parent::__construct(
             '

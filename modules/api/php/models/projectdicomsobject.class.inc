@@ -12,7 +12,7 @@
 namespace LORIS\api\Models;
 
 /**
- * A ProjectDicomsObject contains values from a Dicom file of a project.
+ * A ProjectDicoms contains values from a Dicom file of a project.
  *
  * @category API
  * @package  Loris
@@ -20,7 +20,7 @@ namespace LORIS\api\Models;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris/
  */
-class ProjectDicomsObject implements \LORIS\Data\DataInstance
+class ProjectDicoms implements \LORIS\Data\DataInstance
 {
     /**
      * Implements \LORIS\Data\DataInstance interface for this object.
