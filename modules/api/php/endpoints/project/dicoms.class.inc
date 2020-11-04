@@ -1,31 +1,31 @@
-<?php declare(strict_types=1);
+<?php
 /**
- * This implements the Electrophysiology page class under Project
+ * This implements the Dicoms page class under Project
  *
  * PHP Version 7
  *
  * @category API
- * @package  LORIS
+ * @package  Loris
+ * @author   Simon Pelletier <simon.pelletier@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-
 namespace LORIS\api\Endpoints\Project;
 
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use \LORIS\api\Endpoint;
-use \LORIS\Data\Filters\HasAnyPermissionOrUserSiteMatch;
 
 /**
- * A class for handling the /projects/$projectname/electrophysiology endpoint.
+ * A class for handling the /projects/$projectname/dicoms endpoint.
  *
  * @category API
- * @package  LORIS
+ * @package  Loris
+ * @author   Simon Pelletier <simon.pelletier@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
+class Dicoms extends Endpoint implements \LORIS\Middleware\ETagCalculator
 {
     /**
      * A cache of the results of the endpoint, so that
@@ -47,13 +47,7 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     private function _hasAccess(\User $user)
     {
-        return (
-            $user->hasPermission('electrophysiology_browser_view_allsites') ||
-            (
-                $user->hasStudySite()
-                && $user->hasPermission('electrophysiology_browser_view_site')
-            )
-        );
+        return $user->hasPermission('dicom_archive_view_allsites');
     }
 
     /**
@@ -66,9 +60,8 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
         $this->_project = $project;
     }
 
-
     /**
-     * Returns which methods are supported by this endpoint.
+     * Return which methods are supported by this endpoint.
      *
      * @return array supported HTTP methods
      */
@@ -78,20 +71,14 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
     }
 
     /**
-     * Versions of the LORIS API which are supported by this endpoint.
+     * Versions of the LORIS API which are supported by this
+     * endpoint.
      *
      * @return array a list of supported API versions.
      */
     protected function supportedVersions() : array
     {
-        return [
-            "v0.0.3",
-<<<<<<< 0de8ff48bbfd9a31c83609e98134053fb5846a73
-            "v0.0.4-dev"
-=======
-            "v0.0.4"
->>>>>>> initial commit of transition to api v0.0.4
-        ];
+        return ["v0.0.4-dev"];
     }
 
     /**
@@ -120,6 +107,7 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
         switch ($request->getMethod()) {
         case 'GET':
             return $this->_handleGET($request);
+
         case 'OPTIONS':
             return (new \LORIS\Http\Response())
                 ->withHeader('Allow', $this->allowedMethods());
@@ -131,7 +119,7 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
     }
 
     /**
-     * Creates an array representation of this endpoint's response body
+     * Create an array representation of this endpoint's reponse body
      *
      * @param ServerRequestInterface $request The incoming PSR7 request
      *
@@ -152,23 +140,16 @@ class Recordings extends Endpoint implements \LORIS\Middleware\ETagCalculator
             );
         }
 
-        $filter = new HasAnyPermissionOrUserSiteMatch(
-            ['electrophysiology_browser_view_allsites']
-        );
-
-        $provisioner = new \LORIS\api\Provisioners\ProjectRecordingsRowProvisioner(
+        $provisioner = new \LORIS\api\Provisioners\ProjectDicomsObjectProvisioner(
             $this->_project,
-            $since
+            $since,
+            '\LORIS\api\Models\ProjectDicomsObject'
         );
 
-        $provisioner = $provisioner->filter($filter);
-
-        $recordings = (new \LORIS\Data\Table())
-            ->withDataFrom($provisioner)
-            ->toArray($request->getAttribute('user'));
+        $dicoms = iterator_to_array($provisioner->getAllInstances());
 
         $this->_cache = new \LORIS\Http\Response\JsonResponse(
-            ['Recordings' => $recordings]
+            ['Dicoms' => $dicoms]
         );
 
         return $this->_cache;
