@@ -143,7 +143,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP GET request for the
-     * endpoint /projects/{project}/instruments/{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments{instruments}
      *
      * @return void
      */
@@ -173,7 +173,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PATCH request for the
-     * endpoint /projects/{project}/instruments/{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}
      *
      * @return void
      */
@@ -200,7 +200,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PUT request for the
-     * endpoint /projects/{project}/instruments/{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}
      *
      * @return void
      */
@@ -276,7 +276,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PATCH request for the
-     * endpoint /projects/{project}/instruments{instrument}/flag
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}/flag
      *
      * @return void
      */
@@ -352,7 +352,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PUT request for the
-     * endpoint /projects/{project}/instruments{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}
      *
      * @return void
      */
@@ -426,7 +426,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP GET request for the
-     * endpoint /candidates/{candid}/{visit}/instruments{instruments}/dde
+     * endpoint /candidates/{candid}/{visit}/instruments/{instruments}/dde
      *
      * @return void
      */
@@ -456,7 +456,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PATCH request for the
-     * endpoint /projects/{project}/instruments{instrument}/flag
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}/flag
      *
      * @return void
      */
@@ -489,7 +489,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PUT request for the
-     * endpoint /projects/{project}/instruments{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}
      *
      * @return void
      */
@@ -523,7 +523,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP GET request for the
-     * endpoint /candidates/{candid}/{visit}/instruments{instruments}/dde/flags
+     * endpoint /candidates/{candid}/{visit}/instruments/{instruments}/dde/flags
      *
      * @return void
      */
@@ -553,7 +553,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PATCH request for the
-     * endpoint /projects/{project}/instruments{instrument}/flag
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}/flag
      *
      * @return void
      */
@@ -629,7 +629,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
 
     /**
      * Tests the HTTP PUT request for the
-     * endpoint /projects/{project}/instruments{instrument}
+     * endpoint /candidates/{candid}/{visit}/instruments/{instrument}
      *
      * @return void
      */
