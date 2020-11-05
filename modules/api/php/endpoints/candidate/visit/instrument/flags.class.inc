@@ -90,13 +90,6 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
      */
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
-        $user = $request->getAttribute('user');
-        if ($this->_instrument->_hasAccess($user)) {
-            return new \LORIS\Http\Response\JSON\Forbidden(
-                'Can not update instruments for user' . $user
-            );
-        }
-
         switch ($request->getMethod()) {
         case 'GET':
             return $this->_handleGET($request);
