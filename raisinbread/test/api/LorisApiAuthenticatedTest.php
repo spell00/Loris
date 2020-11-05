@@ -76,7 +76,10 @@ class LorisApiAuthenticatedTest extends LorisIntegrationTest
 
         $this->apiLogin('UnitTester', $this->validPassword);
 
+<<<<<<< 88794fcc924c330f247d501907319f78f497dfc9
 
+=======
+>>>>>>> changing adding new candidate in authentication script
         $this->DB->insert(
             "candidate",
             [
