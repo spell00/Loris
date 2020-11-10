@@ -196,7 +196,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
                 'Instrument' => $this->instrumentTest
             ],
             'Flags' => [
-                'Data_entry'     => 'In Progress',
+                'Data_entry'     => 'Complete',
                 'Administration' => 'All',
                 'Validity'       => 'Invalid' 
             ]
@@ -214,6 +214,45 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
         $body = $response->getBody();
         $this->assertNotEmpty($body);
 
+        // Test that it should be forbidden to modify an instrument that is flagged as Complete
+        $json = [
+            $this->instrumentTest => [
+                'UserID' => "2"
+            ]
+        ];
+        $response   = $this->client->request(
+            'PATCH',
+            "candidates/$this->candidTest/$this->visitTest/instruments/$this->instrumentTest",
+            [
+                'headers' => $this->headers,
+                'json'    => $json,
+                'http_errors' => false
+            ]
+        );
+        $this->assertEquals(403, $response->getStatusCode());
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+
+        // This will test that it should be forbidden to modify an instrument that is flagged as Complete
+        $json = [
+            $this->instrumentTest => [
+                'UserID' => "2"
+            ]
+        ];
+        $response   = $this->client->request(
+            'PATCH',
+            "candidates/$this->candidTest/$this->visitTest/instruments/$this->instrumentTest",
+            [
+                'headers' => $this->headers,
+                'json'    => $json,
+                'http_errors' => false
+            ]
+        );
+        $this->assertEquals(403, $response->getStatusCode());
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
     }
 
     /**
@@ -232,7 +271,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
                 'Instrument' => $this->instrumentTest
             ],
             'Flags' => [
-                'Data_entry'     => 'In Progress',
+                'Data_entry'     => 'Complete',
                 'Administration' => 'Partial',
                 'Validity'       => 'Questionable' 
             ]
@@ -250,6 +289,25 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
         $body = $response->getBody();
         $this->assertNotEmpty($body);
 
+        // This will test that it should be forbidden to modify an instrument that is flagged as Complete
+        $json = [
+            $this->instrumentTest => [
+                'UserID' => "2"
+            ]
+        ];
+        $response   = $this->client->request(
+            'PUT',
+            "candidates/$this->candidTest/$this->visitTest/instruments/$this->instrumentTest",
+            [
+                'headers' => $this->headers,
+                'json'    => $json,
+                'http_errors' => false
+            ]
+        );
+        $this->assertEquals(403, $response->getStatusCode());
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
     }
 
     /**
@@ -395,7 +453,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
                 'Instrument' => $this->instrumentTest
             ],
             'Flags' => [
-                'Data_entry'     => 'In Progress',
+                'Data_entry'     => 'Complete',
                 'Administration' => 'All',
                 'Validity'       => 'Valid' 
             ]
@@ -413,6 +471,25 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
         $body = $response->getBody();
         $this->assertNotEmpty($body);
 
+        // This will test that it should be forbidden to modify an instrument that is flagged as Complete
+        $json = [
+            $this->instrumentTest => [
+                'UserID' => "2"
+            ]
+        ];
+        $response   = $this->client->request(
+            'PATCH',
+            "candidates/$this->candidTest/$this->visitTest/instruments/$this->instrumentTest/dde",
+            [
+                'headers' => $this->headers,
+                'json'    => $json,
+                'http_errors' => false
+            ]
+        );
+        $this->assertEquals(403, $response->getStatusCode());
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
     }
 
     /**
@@ -431,7 +508,7 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
                 'Instrument' => $this->instrumentTest
             ],
             'Flags' => [
-                'Data_entry'     => 'In Progress',
+                'Data_entry'     => 'Complete',
                 'Administration' => 'All',
                 'Validity'       => 'Valid' 
             ]
@@ -448,6 +525,28 @@ class LorisApiInstrumentsTest extends LorisApiAuthenticatedTest
         // Verify the endpoint has a body
         $body = $response->getBody();
         $this->assertNotEmpty($body);
+
+        // This will test that it should be forbidden to modify an instrument that is flagged as Complete
+        $json = [
+            $this->instrumentTest => [
+                'UserID' => "2"
+            ]
+        ];
+        $response   = $this->client->request(
+            'PUT',
+            "candidates/$this->candidTest/$this->visitTest/instruments/$this->instrumentTest/dde",
+            [
+                'headers' => $this->headers,
+                'json'    => $json,
+                'http_errors' => false
+            ]
+        );
+        $this->assertEquals(403, $response->getStatusCode());
+        // Verify the endpoint has a body
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+
+
     }
 
 }
